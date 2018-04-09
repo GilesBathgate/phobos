@@ -227,6 +227,30 @@ inout(char)[] fromStringz(inout(char)* cString) @nogc @system pure nothrow {
 
 /++
     Params:
+        cwString = A null-terminated c-style wide string.
+
+    Returns: A D-style array of `wchar` referencing the same string.  The
+    returned array will retain the same type qualifiers as the input.
+
+    $(RED Important Note:) The returned array is a slice of the original buffer.
+    The original data is not changed and not copied.
++/
+
+inout(wchar)[] fromWStringz(inout(wchar)* cwString) @nogc @system pure nothrow {
+    import core.stdc.wchar_ : wcslen;
+    return cwString ? cwString[0 .. wcslen(cwString)] : null;
+}
+
+///
+@system pure unittest
+{
+    assert(fromWStringz(null) == null);
+    assert(fromWStringz("foo"w) == "foo"w);
+    assert(fromWStringz("foo\0"w) == "foo"w);
+}
+
+/++
+    Params:
         s = A D-style string.
 
     Returns: A C-style null-terminated string equivalent to `s`. `s`
